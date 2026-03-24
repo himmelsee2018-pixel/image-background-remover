@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>图片去背景工具</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🖼️ 图片去背景</h1>
+      <p class="subtitle">上传图片，一键去除背景，免费下载透明 PNG</p>
+    </header>
+
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📁</div>
+      <p>拖拽图片到这里，或 <span class="link">点击上传</span></p>
+      <p class="hint">支持 JPG、PNG、WebP，最大 12MB</p>
+      <input type="file" id="fileInput" accept="image/*" hidden />
+    </div>
+
+    <div class="result-area" id="resultArea" style="display:none">
+      <div class="compare">
+        <div class="compare-item">
+          <p class="label">原图</p>
+          <img id="originalImg" src="" alt="原图" />
+        </div>
+        <div class="compare-item">
+          <p class="label">去背景后</p>
+          <div class="checker-bg">
+            <img id="resultImg" src="" alt="去背景结果" />
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="downloadBtn" class="btn-primary">⬇️ 下载 PNG</button>
+        <button id="resetBtn" class="btn-secondary">重新上传</button>
+      </div>
+    </div>
+
+    <div class="loading" id="loading" style="display:none">
+      <div class="spinner"></div>
+      <p>正在处理中，请稍候...</p>
+    </div>
+
+    <div class="error" id="errorMsg" style="display:none"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
