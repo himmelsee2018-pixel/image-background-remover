@@ -5,12 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>图片去背景工具</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Google One Tap -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <div class="container">
+
+  <!-- 登录遮罩 -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-logo">🖼️</div>
+      <h2>图片去背景工具</h2>
+      <p>请登录后使用，一键去除图片背景</p>
+      <div id="g_id_onload"
+           data-client_id="320862349010-7diu0tm07af6vo0ls6si9g3eibofsct6.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="signin_with"
+           data-size="large"
+           data-logo_alignment="left"
+           data-width="280">
+      </div>
+    </div>
+  </div>
+
+  <!-- 主界面 -->
+  <div class="container" id="mainApp" style="display:none">
     <header>
       <h1>🖼️ 图片去背景</h1>
       <p class="subtitle">上传图片，一键去除背景，免费下载透明 PNG</p>
+      <!-- 用户信息栏 -->
+      <div class="user-bar">
+        <img id="userAvatar" class="user-avatar" src="" alt="avatar" />
+        <span id="userName" class="user-name"></span>
+        <button class="btn-logout" onclick="signOut()">退出登录</button>
+      </div>
     </header>
 
     <div class="upload-area" id="uploadArea">

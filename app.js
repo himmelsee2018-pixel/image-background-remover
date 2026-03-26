@@ -1,5 +1,42 @@
 const API_KEY = 'TkBAVP5RkLhqZMrsQKzPbtjj';
 
+// ========== Google Auth ==========
+
+function handleCredentialResponse(response) {
+  // 解析 JWT，获取用户信息
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  const user = {
+    id: payload.sub,
+    name: payload.name,
+    email: payload.email,
+    picture: payload.picture,
+  };
+  localStorage.setItem('gUser', JSON.stringify(user));
+  showApp(user);
+}
+
+function signOut() {
+  localStorage.removeItem('gUser');
+  location.reload();
+}
+
+function showApp(user) {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('userAvatar').src = user.picture;
+  document.getElementById('userName').textContent = user.name;
+}
+
+// 页面加载时检查登录状态
+window.addEventListener('load', () => {
+  const stored = localStorage.getItem('gUser');
+  if (stored) {
+    showApp(JSON.parse(stored));
+  }
+});
+
+// ========== 图片处理 ==========
+
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
 const resultArea = document.getElementById('resultArea');
@@ -12,10 +49,8 @@ const resetBtn = document.getElementById('resetBtn');
 
 let resultBlob = null;
 
-// Click to upload
 uploadArea.addEventListener('click', () => fileInput.click());
 
-// Drag & drop
 uploadArea.addEventListener('dragover', (e) => {
   e.preventDefault();
   uploadArea.classList.add('dragover');
@@ -65,7 +100,6 @@ async function processFile(file) {
   resultArea.style.display = 'none';
   loading.style.display = 'block';
 
-  // Show original preview
   originalImg.src = URL.createObjectURL(file);
 
   try {
