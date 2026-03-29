@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>图片去背景工具</title>
+  <title>BGRemover – Remove Image Background Free</title>
+  <meta name="description" content="Remove image backgrounds instantly with AI. Free to try, no sign-up required. Get clean transparent PNG in seconds." />
   <link rel="stylesheet" href="style.css" />
   <!-- Google One Tap -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-  <!-- 登录遮罩 -->
+  <!-- ===== Login Overlay ===== -->
   <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
-      <div class="login-logo">🖼️</div>
-      <h2>图片去背景工具</h2>
-      <p>请登录后使用，一键去除图片背景</p>
+      <div class="login-logo">✂️</div>
+      <h2>BGRemover</h2>
+      <p>Sign in to remove backgrounds — <strong>5 free credits</strong> included, no card required.</p>
       <div id="g_id_onload"
            data-client_id="320862349010-7diu0tm07af6vo0ls6si9g3eibofsct6.apps.googleusercontent.com"
            data-callback="handleCredentialResponse"
@@ -30,54 +31,144 @@
            data-logo_alignment="left"
            data-width="280">
       </div>
+      <p class="login-guest-hint">
+        Or <a href="#" onclick="tryAsGuest(); return false;">try 1 free image without signing in →</a>
+      </p>
     </div>
   </div>
 
-  <!-- 主界面 -->
+  <!-- ===== Main App ===== -->
   <div class="container" id="mainApp" style="display:none">
+
+    <!-- Header -->
     <header>
-      <h1>🖼️ 图片去背景</h1>
-      <p class="subtitle">上传图片，一键去除背景，免费下载透明 PNG</p>
-      <!-- 用户信息栏 -->
-      <div class="user-bar">
-        <img id="userAvatar" class="user-avatar" src="" alt="avatar" />
-        <span id="userName" class="user-name"></span>
-        <button class="btn-logout" onclick="signOut()">退出登录</button>
+      <div class="header-top">
+        <div class="brand">
+          <span class="brand-icon">✂️</span>
+          <span class="brand-name">BGRemover</span>
+        </div>
+        <nav class="header-nav">
+          <a href="pricing.html" class="nav-link">Pricing</a>
+          <div class="user-bar" id="userBar">
+            <img id="userAvatar" class="user-avatar" src="" alt="avatar" />
+            <span id="userName" class="user-name"></span>
+            <div class="credits-badge" id="creditsBadge" title="Remaining credits">
+              <span id="creditsCount">–</span> credits
+            </div>
+            <button class="btn-upgrade" onclick="window.location.href='pricing.html'">⚡ Upgrade</button>
+            <button class="btn-logout" onclick="signOut()">Sign out</button>
+          </div>
+          <div id="guestBar" style="display:none">
+            <span class="guest-hint">Guest mode · <strong>1 free use</strong></span>
+            <button class="btn-signin-cta" onclick="showLoginOverlay()">Sign in for more</button>
+          </div>
+        </nav>
+      </div>
+      <div class="hero">
+        <h1>Remove Image Background <span class="hero-highlight">Instantly</span></h1>
+        <p class="subtitle">AI-powered background removal. Clean transparent PNG in seconds.</p>
       </div>
     </header>
 
+    <!-- Upload Area -->
     <div class="upload-area" id="uploadArea">
-      <div class="upload-icon">📁</div>
-      <p>拖拽图片到这里，或 <span class="link">点击上传</span></p>
-      <p class="hint">支持 JPG、PNG、WebP，最大 12MB</p>
+      <div class="upload-icon">🖼️</div>
+      <p>Drag & drop your image here, or <span class="link">browse files</span></p>
+      <p class="hint">Supports JPG, PNG, WebP — up to 12MB</p>
       <input type="file" id="fileInput" accept="image/*" hidden />
     </div>
 
+    <!-- Result Area -->
     <div class="result-area" id="resultArea" style="display:none">
       <div class="compare">
         <div class="compare-item">
-          <p class="label">原图</p>
-          <img id="originalImg" src="" alt="原图" />
+          <p class="label">Original</p>
+          <img id="originalImg" src="" alt="Original" />
         </div>
         <div class="compare-item">
-          <p class="label">去背景后</p>
+          <p class="label">Background Removed</p>
           <div class="checker-bg">
-            <img id="resultImg" src="" alt="去背景结果" />
+            <img id="resultImg" src="" alt="Result" />
           </div>
         </div>
       </div>
       <div class="actions">
-        <button id="downloadBtn" class="btn-primary">⬇️ 下载 PNG</button>
-        <button id="resetBtn" class="btn-secondary">重新上传</button>
+        <button id="downloadBtn" class="btn-primary">⬇️ Download PNG</button>
+        <button id="resetBtn" class="btn-secondary">Try Another</button>
       </div>
     </div>
 
+    <!-- Loading -->
     <div class="loading" id="loading" style="display:none">
       <div class="spinner"></div>
-      <p>正在处理中，请稍候...</p>
+      <p>Removing background…</p>
     </div>
 
+    <!-- Error -->
     <div class="error" id="errorMsg" style="display:none"></div>
+
+    <!-- Quota Exceeded Banner -->
+    <div class="quota-banner" id="quotaBanner" style="display:none">
+      <div class="quota-banner-inner">
+        <span class="quota-icon">⚡</span>
+        <div>
+          <strong>You've used all your free credits</strong>
+          <p>Get more credits to continue removing backgrounds.</p>
+        </div>
+        <a href="pricing.html" class="btn-primary">View Plans →</a>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What is a credit?</summary>
+          <p>One credit = one background removal. Credits never expire, so you can use them whenever you like.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How many free credits do I get?</summary>
+          <p>New accounts get <strong>5 free credits</strong> after signing in with Google. No credit card required.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What image formats are supported?</summary>
+          <p>JPG, PNG, and WebP are supported. Maximum file size is 12MB per image.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What resolution will I get?</summary>
+          <p>All paid credits produce the original full-resolution output. Free credits produce a standard-quality preview.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I use the images commercially?</summary>
+          <p>Yes! All plans include commercial use rights.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do unused credits expire?</summary>
+          <p>Never. Credits you purchase are yours to keep and use at any time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I get more credits?</summary>
+          <p>Visit the <a href="pricing.html">Pricing page</a> to choose a credit pack that fits your needs. PayPal payment coming soon!</p>
+        </details>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>© 2025 BGRemover · <a href="pricing.html">Pricing</a> · Powered by remove.bg API</p>
+    </footer>
+
+  </div><!-- /container -->
+
+  <!-- Upgrade Modal (quota hit mid-session) -->
+  <div id="upgradeModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">⚡</div>
+      <h2>Out of Credits</h2>
+      <p>You've used all your available credits. Upgrade to keep going — credits never expire.</p>
+      <a href="pricing.html" class="btn-primary" style="display:block;text-align:center;margin-bottom:12px;">View Plans</a>
+      <button class="btn-secondary" style="width:100%" onclick="closeModal('upgradeModal')">Maybe later</button>
+    </div>
   </div>
 
   <script src="app.js"></script>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing – BGRemover</title>
+  <meta name="description" content="Simple, transparent pricing for BGRemover. Buy credits once, use them anytime. No subscription required." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="pricing-page">
+
+  <!-- Nav -->
+  <nav class="pricing-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">✂️</span>
+      <span class="brand-name">BGRemover</span>
+    </a>
+    <a href="index.html" class="nav-link">← Back to App</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pricing-hero">
+    <h1>Simple, Transparent Pricing</h1>
+    <p class="pricing-subtitle">Start free · No subscription required · <strong>Credits never expire</strong></p>
+
+    <!-- Toggle (UI only, Credit Packs active) -->
+    <div class="pricing-toggle">
+      <button class="toggle-btn active" id="tabCredits" onclick="switchTab('credits')">Credit Packs</button>
+      <button class="toggle-btn" id="tabMonthly" onclick="switchTab('monthly')">Monthly <span class="save-tag">Save up to 20%</span></button>
+    </div>
+  </section>
+
+  <!-- Pricing Cards -->
+  <section class="pricing-cards" id="creditCards">
+    <!-- Starter -->
+    <div class="pricing-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">$4.99</div>
+      <div class="plan-per">15 credits · <strong>$0.33 each</strong></div>
+      <ul class="plan-features">
+        <li>✅ 15 HD background removals</li>
+        <li>✅ JPG / PNG / WebP support</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Never expires</li>
+        <li class="feature-dim">– Priority processing</li>
+      </ul>
+      <button class="btn-plan" onclick="openPaymentModal('Starter', '$4.99')">Buy Starter</button>
+    </div>
+
+    <!-- Popular -->
+    <div class="pricing-card popular">
+      <div class="popular-badge">Most Popular</div>
+      <div class="plan-name">Popular</div>
+      <div class="plan-price">$12.99</div>
+      <div class="plan-per">50 credits · <strong>$0.26 each</strong></div>
+      <ul class="plan-features">
+        <li>✅ 50 HD background removals</li>
+        <li>✅ JPG / PNG / WebP support</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Never expires</li>
+        <li>✅ Save 21% vs Starter</li>
+      </ul>
+      <button class="btn-plan btn-plan-popular" onclick="openPaymentModal('Popular', '$12.99')">Buy Popular</button>
+    </div>
+
+    <!-- Pro Pack -->
+    <div class="pricing-card">
+      <div class="best-value-badge">Best Value</div>
+      <div class="plan-name">Pro Pack</div>
+      <div class="plan-price">$29.99</div>
+      <div class="plan-per">80 credits · <strong>$0.37 each</strong></div>
+      <ul class="plan-features">
+        <li>✅ 80 HD background removals</li>
+        <li>✅ JPG / PNG / WebP support</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Never expires</li>
+        <li>✅ Save 20% vs Starter</li>
+      </ul>
+      <button class="btn-plan" onclick="openPaymentModal('Pro Pack', '$29.99')">Buy Pro Pack</button>
+    </div>
+  </section>
+
+  <!-- Monthly Cards (hidden by default) -->
+  <section class="pricing-cards" id="monthlyCards" style="display:none">
+    <div class="pricing-card">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">$3.99<span class="plan-mo">/mo</span></div>
+      <div class="plan-per">50 credits/month</div>
+      <ul class="plan-features">
+        <li>✅ 50 HD removals per month</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Cancel anytime</li>
+        <li class="feature-dim">– Unused credits don't roll over</li>
+      </ul>
+      <button class="btn-plan" onclick="openPaymentModal('Basic Monthly', '$3.99/mo')">Get Basic</button>
+    </div>
+    <div class="pricing-card popular">
+      <div class="popular-badge">Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$9.99<span class="plan-mo">/mo</span></div>
+      <div class="plan-per">300 credits/month</div>
+      <ul class="plan-features">
+        <li>✅ 300 HD removals per month</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Cancel anytime</li>
+        <li>✅ Priority processing</li>
+      </ul>
+      <button class="btn-plan btn-plan-popular" onclick="openPaymentModal('Pro Monthly', '$9.99/mo')">Get Pro</button>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Business</div>
+      <div class="plan-price">$24.99<span class="plan-mo">/mo</span></div>
+      <div class="plan-per">Unlimited removals</div>
+      <ul class="plan-features">
+        <li>✅ Unlimited HD removals</li>
+        <li>✅ Commercial use allowed</li>
+        <li>✅ Cancel anytime</li>
+        <li>✅ Priority processing</li>
+      </ul>
+      <button class="btn-plan" onclick="openPaymentModal('Business Monthly', '$24.99/mo')">Get Business</button>
+    </div>
+  </section>
+
+  <!-- Trust strip -->
+  <div class="trust-strip">
+    <span>🔒 Secure payment</span>
+    <span>↩️ Cancel anytime</span>
+    <span>💸 No hidden fees</span>
+    <span>✅ 7-day refund guarantee</span>
+  </div>
+
+  <!-- FAQ on pricing page -->
+  <section class="faq pricing-faq">
+    <h2>Pricing FAQ</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Do credits expire?</summary>
+        <p>No! Credits you purchase never expire. Use them whenever you need them.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What payment methods are accepted?</summary>
+        <p>We're integrating <strong>PayPal</strong> — it will be available very soon! Sign up below to be notified.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I get a refund?</summary>
+        <p>Yes, we offer a 7-day money-back guarantee if you're not satisfied. Contact us at support@bgremover.app.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is commercial use allowed?</summary>
+        <p>Yes, all plans include full commercial use rights for your output images.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2025 BGRemover · <a href="index.html">App</a> · Powered by remove.bg API</p>
+  </footer>
+
+  <!-- ===== Payment Coming Soon Modal ===== -->
+  <div id="paymentModal" class="modal-overlay" style="display:none">
+    <div class="modal-box payment-modal">
+      <div class="modal-icon">🚀</div>
+      <h2>Payment Coming Soon</h2>
+      <p>You selected <strong id="selectedPlan">–</strong></p>
+      <p class="payment-desc">We're integrating PayPal payments. You'll be able to purchase this plan very soon!</p>
+      <ul class="payment-perks">
+        <li>✅ In the meantime, sign up for a free account</li>
+        <li>✅ Get 5 free background removals</li>
+        <li>✅ No credit card required</li>
+      </ul>
+      <div class="notify-form">
+        <input type="email" id="notifyEmail" placeholder="Enter your email to be notified" />
+        <button class="btn-primary" onclick="submitNotify()">Got it, notify me when ready</button>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal('paymentModal')">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      const credits = document.getElementById('creditCards');
+      const monthly = document.getElementById('monthlyCards');
+      const tabC = document.getElementById('tabCredits');
+      const tabM = document.getElementById('tabMonthly');
+      if (tab === 'credits') {
+        credits.style.display = '';
+        monthly.style.display = 'none';
+        tabC.classList.add('active');
+        tabM.classList.remove('active');
+      } else {
+        credits.style.display = 'none';
+        monthly.style.display = '';
+        tabC.classList.remove('active');
+        tabM.classList.add('active');
+      }
+    }
+
+    function openPaymentModal(plan, price) {
+      document.getElementById('selectedPlan').textContent = plan + ' — ' + price;
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function submitNotify() {
+      const email = document.getElementById('notifyEmail').value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+      // TODO: send to backend / email list
+      const btn = document.querySelector('.notify-form .btn-primary');
+      btn.textContent = '✅ You\'re on the list!';
+      btn.disabled = true;
+      document.getElementById('notifyEmail').disabled = true;
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('paymentModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal('paymentModal');
+    });
+  </script>
+</body>
+</html>
