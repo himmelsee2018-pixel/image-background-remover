@@ -1,5 +1,5 @@
 const REMOVE_BG_API_KEY = 'TkBAVP5RkLhqZMrsQKzPbtjj';
-const API_BASE = 'https://bgremover-api.a313c3342ac554acbbce04eafd257530.workers.dev';
+const API_BASE = 'https://bgremover-api.himmelsee2018.workers.dev';
 
 // ============================================================
 //  State

@@ -6,7 +6,7 @@ account_id = "a313c3342ac554acbbce04eafd257530"
 [[d1_databases]]
 binding = "DB"
 database_name = "bgremover-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "c38b73e5-11ba-4809-ab9b-9669925f32c4"
 
 [vars]
 PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com"
