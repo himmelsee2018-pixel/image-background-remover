@@ -6,6 +6,10 @@
   <title>Pricing – BGRemover</title>
   <meta name="description" content="Simple, transparent pricing for BGRemover. Buy credits once, use them anytime. No subscription required." />
   <link rel="stylesheet" href="style.css" />
+  <!-- PayPal JS SDK (Sandbox) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AZia4eoePw0q9ruwj6WQQSvzYsKSfnvAV1cDnmehyUz9-Y1ndgSRIocnhaJ_oC7L7xFDBFQvlfs6KGQF&currency=USD" async></script>
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="pricing-page">
 
@@ -15,23 +19,25 @@
       <span class="brand-icon">✂️</span>
       <span class="brand-name">BGRemover</span>
     </a>
-    <a href="index.html" class="nav-link">← Back to App</a>
+    <div class="nav-right">
+      <span id="navCredits" class="credits-badge" style="display:none"></span>
+      <a href="index.html" class="nav-link">← Back to App</a>
+    </div>
   </nav>
 
   <!-- Hero -->
   <section class="pricing-hero">
     <h1>Simple, Transparent Pricing</h1>
     <p class="pricing-subtitle">Start free · No subscription required · <strong>Credits never expire</strong></p>
-
-    <!-- Toggle (UI only, Credit Packs active) -->
     <div class="pricing-toggle">
       <button class="toggle-btn active" id="tabCredits" onclick="switchTab('credits')">Credit Packs</button>
-      <button class="toggle-btn" id="tabMonthly" onclick="switchTab('monthly')">Monthly <span class="save-tag">Save up to 20%</span></button>
+      <button class="toggle-btn" id="tabMonthly" onclick="switchTab('monthly')">Monthly <span class="save-tag">Save 20%</span></button>
     </div>
   </section>
 
-  <!-- Pricing Cards -->
+  <!-- Credit Pack Cards -->
   <section class="pricing-cards" id="creditCards">
+
     <!-- Starter -->
     <div class="pricing-card">
       <div class="plan-name">Starter</div>
@@ -41,10 +47,13 @@
         <li>✅ 15 HD background removals</li>
         <li>✅ JPG / PNG / WebP support</li>
         <li>✅ Commercial use allowed</li>
-        <li>✅ Never expires</li>
+        <li>✅ Credits never expire</li>
         <li class="feature-dim">– Priority processing</li>
       </ul>
-      <button class="btn-plan" onclick="openPaymentModal('Starter', '$4.99')">Buy Starter</button>
+      <div id="paypal-starter" class="paypal-btn-container"></div>
+      <div id="fallback-starter" class="paypal-fallback" style="display:none">
+        <button class="btn-plan" onclick="requireLogin('starter')">Buy Starter</button>
+      </div>
     </div>
 
     <!-- Popular -->
@@ -57,10 +66,13 @@
         <li>✅ 50 HD background removals</li>
         <li>✅ JPG / PNG / WebP support</li>
         <li>✅ Commercial use allowed</li>
-        <li>✅ Never expires</li>
+        <li>✅ Credits never expire</li>
         <li>✅ Save 21% vs Starter</li>
       </ul>
-      <button class="btn-plan btn-plan-popular" onclick="openPaymentModal('Popular', '$12.99')">Buy Popular</button>
+      <div id="paypal-popular" class="paypal-btn-container"></div>
+      <div id="fallback-popular" class="paypal-fallback" style="display:none">
+        <button class="btn-plan btn-plan-popular" onclick="requireLogin('popular')">Buy Popular</button>
+      </div>
     </div>
 
     <!-- Pro Pack -->
@@ -73,11 +85,15 @@
         <li>✅ 80 HD background removals</li>
         <li>✅ JPG / PNG / WebP support</li>
         <li>✅ Commercial use allowed</li>
-        <li>✅ Never expires</li>
-        <li>✅ Save 20% vs Starter</li>
+        <li>✅ Credits never expire</li>
+        <li>✅ Most credits per pack</li>
       </ul>
-      <button class="btn-plan" onclick="openPaymentModal('Pro Pack', '$29.99')">Buy Pro Pack</button>
+      <div id="paypal-pro" class="paypal-btn-container"></div>
+      <div id="fallback-pro" class="paypal-fallback" style="display:none">
+        <button class="btn-plan" onclick="requireLogin('pro')">Buy Pro Pack</button>
+      </div>
     </div>
+
   </section>
 
   <!-- Monthly Cards (hidden by default) -->
@@ -92,7 +108,7 @@
         <li>✅ Cancel anytime</li>
         <li class="feature-dim">– Unused credits don't roll over</li>
       </ul>
-      <button class="btn-plan" onclick="openPaymentModal('Basic Monthly', '$3.99/mo')">Get Basic</button>
+      <button class="btn-plan" onclick="showComingSoon()">Coming Soon</button>
     </div>
     <div class="pricing-card popular">
       <div class="popular-badge">Most Popular</div>
@@ -105,7 +121,7 @@
         <li>✅ Cancel anytime</li>
         <li>✅ Priority processing</li>
       </ul>
-      <button class="btn-plan btn-plan-popular" onclick="openPaymentModal('Pro Monthly', '$9.99/mo')">Get Pro</button>
+      <button class="btn-plan btn-plan-popular" onclick="showComingSoon()">Coming Soon</button>
     </div>
     <div class="pricing-card">
       <div class="plan-name">Business</div>
@@ -117,19 +133,19 @@
         <li>✅ Cancel anytime</li>
         <li>✅ Priority processing</li>
       </ul>
-      <button class="btn-plan" onclick="openPaymentModal('Business Monthly', '$24.99/mo')">Get Business</button>
+      <button class="btn-plan" onclick="showComingSoon()">Coming Soon</button>
     </div>
   </section>
 
   <!-- Trust strip -->
   <div class="trust-strip">
-    <span>🔒 Secure payment</span>
-    <span>↩️ Cancel anytime</span>
+    <span>🔒 Secure PayPal payment</span>
     <span>💸 No hidden fees</span>
-    <span>✅ 7-day refund guarantee</span>
+    <span>✅ Credits never expire</span>
+    <span>↩️ 7-day refund guarantee</span>
   </div>
 
-  <!-- FAQ on pricing page -->
+  <!-- FAQ -->
   <section class="faq pricing-faq">
     <h2>Pricing FAQ</h2>
     <div class="faq-list">
@@ -139,15 +155,19 @@
       </details>
       <details class="faq-item">
         <summary>What payment methods are accepted?</summary>
-        <p>We're integrating <strong>PayPal</strong> — it will be available very soon! Sign up below to be notified.</p>
+        <p>We accept <strong>PayPal</strong> and all major credit/debit cards via PayPal Checkout.</p>
       </details>
       <details class="faq-item">
         <summary>Can I get a refund?</summary>
-        <p>Yes, we offer a 7-day money-back guarantee if you're not satisfied. Contact us at support@bgremover.app.</p>
+        <p>Yes, we offer a 7-day money-back guarantee. Contact us at support@bgremover.app.</p>
       </details>
       <details class="faq-item">
         <summary>Is commercial use allowed?</summary>
         <p>Yes, all plans include full commercial use rights for your output images.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do I need a PayPal account?</summary>
+        <p>No — you can pay with a credit or debit card through PayPal without creating an account.</p>
       </details>
     </div>
   </section>
@@ -156,70 +176,236 @@
     <p>© 2025 BGRemover · <a href="index.html">App</a> · Powered by remove.bg API</p>
   </footer>
 
-  <!-- ===== Payment Coming Soon Modal ===== -->
-  <div id="paymentModal" class="modal-overlay" style="display:none">
-    <div class="modal-box payment-modal">
-      <div class="modal-icon">🚀</div>
-      <h2>Payment Coming Soon</h2>
-      <p>You selected <strong id="selectedPlan">–</strong></p>
-      <p class="payment-desc">We're integrating PayPal payments. You'll be able to purchase this plan very soon!</p>
-      <ul class="payment-perks">
-        <li>✅ In the meantime, sign up for a free account</li>
-        <li>✅ Get 5 free background removals</li>
-        <li>✅ No credit card required</li>
-      </ul>
-      <div class="notify-form">
-        <input type="email" id="notifyEmail" placeholder="Enter your email to be notified" />
-        <button class="btn-primary" onclick="submitNotify()">Got it, notify me when ready</button>
+  <!-- Login Modal (required before purchase) -->
+  <div id="loginModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">✂️</div>
+      <h2>Sign in to Purchase</h2>
+      <p>You need a free account to buy credits. Sign in with Google — it only takes a second.</p>
+      <div id="g_id_onload"
+           data-client_id="320862349010-7diu0tm07af6vo0ls6si9g3eibofsct6.apps.googleusercontent.com"
+           data-callback="handleLoginForPurchase"
+           data-auto_prompt="false">
       </div>
-      <button class="btn-close-modal" onclick="closeModal('paymentModal')">Close</button>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="signin_with"
+           data-size="large"
+           data-logo_alignment="left"
+           data-width="280">
+      </div>
+      <button class="btn-close-modal" onclick="closeModal('loginModal')" style="margin-top:16px">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">🎉</div>
+      <h2>Payment Successful!</h2>
+      <p id="successMsg">Your credits have been added to your account.</p>
+      <a href="index.html" class="btn-primary" style="display:block;text-align:center;margin-bottom:12px">
+        Start Removing Backgrounds →
+      </a>
+      <button class="btn-secondary" style="width:100%" onclick="closeModal('successModal')">Stay on Pricing</button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div id="errorModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">❌</div>
+      <h2>Payment Failed</h2>
+      <p id="errorMsg">Something went wrong. Please try again.</p>
+      <button class="btn-primary" style="width:100%;margin-bottom:12px" onclick="closeModal('errorModal')">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Coming Soon Modal -->
+  <div id="comingSoonModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-icon">🚀</div>
+      <h2>Monthly Plans Coming Soon</h2>
+      <p>Monthly subscriptions are in the works! For now, try our credit packs — they never expire.</p>
+      <button class="btn-primary" style="width:100%;margin-bottom:12px" onclick="closeModal('comingSoonModal');switchTab('credits')">
+        View Credit Packs
+      </button>
+      <button class="btn-close-modal" onclick="closeModal('comingSoonModal')">Close</button>
     </div>
   </div>
 
   <script>
-    function switchTab(tab) {
-      const credits = document.getElementById('creditCards');
-      const monthly = document.getElementById('monthlyCards');
-      const tabC = document.getElementById('tabCredits');
-      const tabM = document.getElementById('tabMonthly');
-      if (tab === 'credits') {
-        credits.style.display = '';
-        monthly.style.display = 'none';
-        tabC.classList.add('active');
-        tabM.classList.remove('active');
+    const API_BASE = 'https://bgremover-api.a313c3342ac554acbbce04eafd257530.workers.dev';
+
+    let currentUser = null;
+    let pendingPlan = null;
+
+    // ── Auth ────────────────────────────────────────────────
+    function loadUser() {
+      const stored = localStorage.getItem('bgr_user');
+      if (stored) {
+        try { currentUser = JSON.parse(stored); } catch(e) {}
+      }
+      updateNavCredits();
+    }
+
+    function updateNavCredits() {
+      const el = document.getElementById('navCredits');
+      if (!el) return;
+      if (currentUser) {
+        el.textContent = (currentUser.credits ?? '–') + ' credits';
+        el.style.display = 'inline-block';
       } else {
-        credits.style.display = 'none';
-        monthly.style.display = '';
-        tabC.classList.remove('active');
-        tabM.classList.add('active');
+        el.style.display = 'none';
       }
     }
 
-    function openPaymentModal(plan, price) {
-      document.getElementById('selectedPlan').textContent = plan + ' — ' + price;
-      document.getElementById('paymentModal').style.display = 'flex';
+    async function handleLoginForPurchase(response) {
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential }),
+        });
+        const data = await res.json();
+        if (data.user) {
+          currentUser = { ...data.user, _credential: response.credential };
+          localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+          closeModal('loginModal');
+          updateNavCredits();
+          // Retry purchase if they came here from a plan click
+          if (pendingPlan) renderPayPalButtons();
+        }
+      } catch(e) {
+        console.error('Login error', e);
+      }
+    }
+
+    function requireLogin(plan) {
+      pendingPlan = plan;
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    // ── PayPal buttons ──────────────────────────────────────
+    const PLAN_CONFIGS = [
+      { id: 'starter', containerId: 'paypal-starter', fallbackId: 'fallback-starter' },
+      { id: 'popular', containerId: 'paypal-popular', fallbackId: 'fallback-popular' },
+      { id: 'pro',     containerId: 'paypal-pro',     fallbackId: 'fallback-pro' },
+    ];
+
+    function renderPayPalButtons() {
+      if (typeof paypal === 'undefined') {
+        // PayPal SDK not loaded yet — show fallback buttons
+        PLAN_CONFIGS.forEach(({ containerId, fallbackId }) => {
+          document.getElementById(containerId).style.display = 'none';
+          document.getElementById(fallbackId).style.display = 'block';
+        });
+        return;
+      }
+
+      PLAN_CONFIGS.forEach(({ id, containerId, fallbackId }) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // clear any previous render
+        document.getElementById(fallbackId).style.display = 'none';
+
+        paypal.Buttons({
+          style: {
+            shape:  'rect',
+            color:  id === 'popular' ? 'gold' : 'blue',
+            layout: 'vertical',
+            label:  'pay',
+            height: 44,
+          },
+
+          createOrder: async () => {
+            if (!currentUser) {
+              requireLogin(id);
+              throw new Error('Login required');
+            }
+            const res = await fetch(`${API_BASE}/api/paypal/create-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ plan: id, google_id: currentUser.google_id }),
+            });
+            const data = await res.json();
+            if (!data.id) throw new Error(data.error || 'Failed to create order');
+            return data.id;
+          },
+
+          onApprove: async (data) => {
+            try {
+              const res = await fetch(`${API_BASE}/api/paypal/capture-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderID: data.orderID, google_id: currentUser.google_id }),
+              });
+              const result = await res.json();
+              if (result.success) {
+                // Update local credits
+                currentUser.credits = result.credits;
+                localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+                updateNavCredits();
+
+                document.getElementById('successMsg').textContent =
+                  `🎉 ${result.added} credits added! You now have ${result.credits} credits.`;
+                document.getElementById('successModal').style.display = 'flex';
+              } else {
+                throw new Error(result.error || 'Capture failed');
+              }
+            } catch(e) {
+              document.getElementById('errorMsg').textContent = e.message;
+              document.getElementById('errorModal').style.display = 'flex';
+            }
+          },
+
+          onError: (err) => {
+            console.error('PayPal error', err);
+            document.getElementById('errorMsg').textContent = 'Payment was cancelled or failed. Please try again.';
+            document.getElementById('errorModal').style.display = 'flex';
+          },
+
+          onCancel: () => {
+            console.log('Payment cancelled');
+          },
+
+        }).render(`#${containerId}`);
+      });
+    }
+
+    // ── UI helpers ──────────────────────────────────────────
+    function switchTab(tab) {
+      const credits = document.getElementById('creditCards');
+      const monthly = document.getElementById('monthlyCards');
+      document.getElementById('tabCredits').classList.toggle('active', tab === 'credits');
+      document.getElementById('tabMonthly').classList.toggle('active', tab !== 'credits');
+      credits.style.display = tab === 'credits' ? '' : 'none';
+      monthly.style.display = tab !== 'credits' ? '' : 'none';
     }
 
     function closeModal(id) {
       document.getElementById(id).style.display = 'none';
     }
 
-    function submitNotify() {
-      const email = document.getElementById('notifyEmail').value.trim();
-      if (!email || !email.includes('@')) {
-        alert('Please enter a valid email address.');
-        return;
-      }
-      // TODO: send to backend / email list
-      const btn = document.querySelector('.notify-form .btn-primary');
-      btn.textContent = '✅ You\'re on the list!';
-      btn.disabled = true;
-      document.getElementById('notifyEmail').disabled = true;
+    function showComingSoon() {
+      document.getElementById('comingSoonModal').style.display = 'flex';
     }
 
-    // Close modal on backdrop click
-    document.getElementById('paymentModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal('paymentModal');
+    // Close modals on backdrop click
+    ['loginModal','successModal','errorModal','comingSoonModal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) closeModal(id);
+      });
+    });
+
+    // ── Init ────────────────────────────────────────────────
+    loadUser();
+
+    // Wait for PayPal SDK to load then render buttons
+    window.addEventListener('load', () => {
+      // Small delay to ensure PayPal SDK is ready
+      setTimeout(renderPayPalButtons, 500);
     });
   </script>
 </body>

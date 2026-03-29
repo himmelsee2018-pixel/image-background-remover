@@ -1,16 +1,11 @@
-const API_KEY = 'TkBAVP5RkLhqZMrsQKzPbtjj';
-
-// ============================================================
-//  Credit system config
-// ============================================================
-const FREE_GUEST_CREDITS   = 1;   // unregistered users
-const FREE_SIGNUP_CREDITS  = 5;   // new Google sign-in users
+const REMOVE_BG_API_KEY = 'TkBAVP5RkLhqZMrsQKzPbtjj';
+const API_BASE = 'https://bgremover-api.a313c3342ac554acbbce04eafd257530.workers.dev';
 
 // ============================================================
 //  State
 // ============================================================
-let currentUser  = null;   // { id, name, email, picture, isGuest }
-let resultBlob   = null;
+let currentUser = null;   // { google_id, email, name, picture, credits, _credential }
+let resultBlob  = null;
 
 // ============================================================
 //  DOM refs
@@ -26,58 +21,62 @@ const downloadBtn = document.getElementById('downloadBtn');
 const resetBtn    = document.getElementById('resetBtn');
 
 // ============================================================
-//  Credit helpers (stored in localStorage, placeholder for backend)
+//  Credits UI
 // ============================================================
-function getUserKey(uid) { return `credits_${uid}`; }
-
-function getCredits(uid) {
-  const raw = localStorage.getItem(getUserKey(uid));
-  if (raw === null) return null;  // first visit
-  return parseInt(raw, 10);
-}
-
-function setCredits(uid, n) {
-  localStorage.setItem(getUserKey(uid), String(n));
-}
-
-function deductCredit(uid) {
-  const c = getCredits(uid);
-  if (c === null || c <= 0) return false;
-  setCredits(uid, c - 1);
-  updateCreditsBadge();
-  return true;
-}
-
 function updateCreditsBadge() {
-  if (!currentUser) return;
   const badge = document.getElementById('creditsBadge');
   const count = document.getElementById('creditsCount');
   if (!badge || !count) return;
-  const c = getCredits(currentUser.id);
-  count.textContent = c !== null ? c : '–';
-  badge.classList.toggle('credits-low', c !== null && c <= 1);
+  const c = currentUser?.credits;
+  count.textContent = (c !== null && c !== undefined) ? c : '–';
+  badge.classList.toggle('credits-low', c !== null && c !== undefined && c <= 1);
 }
 
 // ============================================================
 //  Google Auth
 // ============================================================
-function handleCredentialResponse(response) {
-  const payload = JSON.parse(atob(response.credential.split('.')[1]));
-  const user = {
-    id:      payload.sub,
-    name:    payload.name,
-    email:   payload.email,
-    picture: payload.picture,
-    isGuest: false,
-  };
-  localStorage.setItem('bgr_user', JSON.stringify(user));
+async function handleCredentialResponse(response) {
+  try {
+    // Call backend to upsert user & get credits
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ credential: response.credential }),
+    });
+    const data = await res.json();
 
-  // Grant signup credits if first time
-  if (getCredits(user.id) === null) {
-    setCredits(user.id, FREE_SIGNUP_CREDITS);
+    if (data.user) {
+      currentUser = { ...data.user, _credential: response.credential };
+      localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+      showApp(currentUser);
+    } else {
+      // Fallback: parse from JWT if backend unavailable
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      currentUser = {
+        google_id: payload.sub,
+        name:      payload.name,
+        email:     payload.email,
+        picture:   payload.picture,
+        credits:   5,
+        _credential: response.credential,
+      };
+      localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+      showApp(currentUser);
+    }
+  } catch(e) {
+    console.warn('Backend unavailable, using local auth', e);
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    currentUser = {
+      google_id: payload.sub,
+      name:      payload.name,
+      email:     payload.email,
+      picture:   payload.picture,
+      credits:   parseInt(localStorage.getItem(`credits_${payload.sub}`) || '5'),
+      _credential: response.credential,
+    };
+    localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+    showApp(currentUser);
   }
-
-  showApp(user);
 }
 
 function signOut() {
@@ -92,19 +91,16 @@ function showLoginOverlay() {
 
 // Guest mode
 function tryAsGuest() {
-  const guestId = 'guest';
-  const user = { id: guestId, name: 'Guest', email: '', picture: '', isGuest: true };
-
-  if (getCredits(guestId) === null) {
-    setCredits(guestId, FREE_GUEST_CREDITS);
-  }
+  const guestCredits = parseInt(localStorage.getItem('guest_credits') || '1');
+  currentUser = { google_id: 'guest', name: 'Guest', email: '', picture: '', credits: guestCredits, isGuest: true };
 
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('userBar').style.display = 'none';
+  document.getElementById('userBar').style.display  = 'none';
   document.getElementById('guestBar').style.display = 'flex';
-  currentUser = user;
   updateCreditsBadge();
+
+  if (guestCredits <= 0) showQuotaBanner();
 }
 
 function showApp(user) {
@@ -113,38 +109,99 @@ function showApp(user) {
   document.getElementById('mainApp').style.display   = 'block';
   document.getElementById('userBar').style.display   = 'flex';
   document.getElementById('guestBar').style.display  = 'none';
-  document.getElementById('userAvatar').src           = user.picture;
-  document.getElementById('userName').textContent     = user.name;
-  updateCreditsBadge();
 
-  // Show quota banner if 0 credits
-  if (getCredits(user.id) === 0) {
-    showQuotaBanner();
+  const avatar = document.getElementById('userAvatar');
+  if (avatar) avatar.src = user.picture || '';
+  const nameEl = document.getElementById('userName');
+  if (nameEl) nameEl.textContent = user.name || user.email || '';
+
+  updateCreditsBadge();
+  if ((user.credits ?? 1) <= 0) showQuotaBanner();
+}
+
+// ============================================================
+//  Credit deduction (via backend)
+// ============================================================
+async function deductCreditBackend() {
+  if (!currentUser || currentUser.isGuest) {
+    // Guest: use localStorage
+    const c = parseInt(localStorage.getItem('guest_credits') || '1');
+    if (c <= 0) return false;
+    localStorage.setItem('guest_credits', String(c - 1));
+    currentUser.credits = c - 1;
+    updateCreditsBadge();
+    return true;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/process`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${currentUser._credential}`,
+      },
+    });
+    const data = await res.json();
+    if (res.status === 402) return false; // insufficient credits
+    if (data.success) {
+      currentUser.credits = data.credits_remaining;
+      localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+      updateCreditsBadge();
+      return true;
+    }
+    return false;
+  } catch(e) {
+    // Fallback to local if backend unreachable
+    console.warn('Backend unreachable, using local credit deduction');
+    const c = currentUser.credits ?? 0;
+    if (c <= 0) return false;
+    currentUser.credits = c - 1;
+    localStorage.setItem('bgr_user', JSON.stringify(currentUser));
+    updateCreditsBadge();
+    return true;
   }
 }
 
 // ============================================================
-//  Modal helpers
+//  Quota banner / modals
 // ============================================================
-function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
-}
-
 function showQuotaBanner() {
   const banner = document.getElementById('quotaBanner');
   if (banner) banner.style.display = 'block';
 }
 
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
 // ============================================================
-//  Page load – restore session
+//  Page load
 // ============================================================
 window.addEventListener('load', () => {
   const stored = localStorage.getItem('bgr_user');
   if (stored) {
-    try { showApp(JSON.parse(stored)); } catch(e) {}
+    try {
+      const user = JSON.parse(stored);
+      // Refresh credits from backend silently
+      if (user._credential && !user.isGuest) {
+        fetch(`${API_BASE}/api/user/credits`, {
+          headers: { Authorization: `Bearer ${user._credential}` },
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (typeof data.credits === 'number') {
+              user.credits = data.credits;
+              localStorage.setItem('bgr_user', JSON.stringify(user));
+            }
+            showApp(user);
+          })
+          .catch(() => showApp(user));
+      } else {
+        showApp(user);
+      }
+    } catch(e) {}
   }
 
-  // Close upgrade modal on backdrop click
   const modal = document.getElementById('upgradeModal');
   if (modal) {
     modal.addEventListener('click', (e) => {
@@ -199,8 +256,8 @@ async function processFile(file) {
   }
 
   // Check credits
-  const credits = getCredits(currentUser.id);
-  if (credits !== null && credits <= 0) {
+  const credits = currentUser.credits ?? 0;
+  if (credits <= 0) {
     document.getElementById('upgradeModal').style.display = 'flex';
     return;
   }
@@ -218,7 +275,6 @@ async function processFile(file) {
   uploadArea.style.display = 'none';
   resultArea.style.display = 'none';
   loading.style.display    = 'block';
-
   originalImg.src = URL.createObjectURL(file);
 
   try {
@@ -228,7 +284,7 @@ async function processFile(file) {
 
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method:  'POST',
-      headers: { 'X-Api-Key': API_KEY },
+      headers: { 'X-Api-Key': REMOVE_BG_API_KEY },
       body:    formData,
     });
 
@@ -237,29 +293,32 @@ async function processFile(file) {
       throw new Error(err?.errors?.[0]?.title || `Request failed (${response.status})`);
     }
 
-    // Deduct credit on success
-    deductCredit(currentUser.id);
+    // Deduct credit (after success)
+    const deducted = await deductCreditBackend();
+    if (!deducted) {
+      // Edge case: ran out between check and deduction
+      loading.style.display = 'none';
+      uploadArea.style.display = 'block';
+      document.getElementById('upgradeModal').style.display = 'flex';
+      return;
+    }
 
     resultBlob = await response.blob();
     resultImg.src = URL.createObjectURL(resultBlob);
-
-    loading.style.display = 'none';
+    loading.style.display    = 'none';
     resultArea.style.display = 'block';
 
-    // If now at 0, show banner below result
-    if (getCredits(currentUser.id) === 0) {
-      showQuotaBanner();
-    }
+    if ((currentUser.credits ?? 1) <= 0) showQuotaBanner();
 
   } catch (err) {
-    loading.style.display = 'none';
+    loading.style.display    = 'none';
     uploadArea.style.display = 'block';
     showError('Processing failed: ' + err.message);
   }
 }
 
 function showError(msg) {
-  errorMsg.textContent = msg;
+  errorMsg.textContent   = msg;
   errorMsg.style.display = 'block';
 }
 

@@ -1,0 +1,13 @@
+name = "bgremover-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+account_id = "a313c3342ac554acbbce04eafd257530"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bgremover-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[vars]
+PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com"
+FRONTEND_ORIGIN = "https://imagebgremoved.shop"
