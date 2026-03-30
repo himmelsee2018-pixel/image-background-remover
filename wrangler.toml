@@ -1,4 +1,4 @@
-name = "bgremover-api"
+name = "image-background-remover"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 account_id = "a313c3342ac554acbbce04eafd257530"
